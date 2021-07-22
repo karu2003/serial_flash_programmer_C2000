@@ -125,6 +125,8 @@ set(ALL_FILES
 ################################################################################
 add_executable(${PROJECT_NAME} ${ALL_FILES})
 
+include_directories(.)
+
 add_precompiled_header(${PROJECT_NAME} "stdafx.h" "stdafx.cpp")
 
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
