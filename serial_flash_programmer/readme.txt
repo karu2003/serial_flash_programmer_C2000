@@ -8,6 +8,8 @@ to run on linux machines.
 
 The resulting serial_flash_programmer.exe should be run from the command line.
 
+base on C2000Ware_1_00_06_00.
+
 Build on Linux
 
 mkdir build
