@@ -1,0 +1,7 @@
+in wsl sudo chmod 666 /dev/ttyS8
+
+ln -s ../serial_flash_programmer/build/serial_flash_programmer
+
+win .\serial_flash_programmer.exe  -d f2806x -k .\f28069_sci_flash_kernel.txt  -a .\Example_2806xLaunchPad.txt -b 38400 -p COM8
+linux ./serial_flash_programmer  -d f2806x -k f28069_sci_flash_kernel.txt  -a Example_2806xLaunchPad.txt -b 38400 -p /dev/ttyS8
+RPi ./serial_flash_programmer  -d f2806x -k f28069_sci_flash_kernel.txt  -a Example_2806xLaunchPad.txt -b 38400 -p /dev/ttyUSB0 
