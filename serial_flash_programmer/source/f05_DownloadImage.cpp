@@ -41,13 +41,15 @@
 // Helpful macros for generating output depending upon verbose and quiet flags.
 //
 //*****************************************************************************
-#define VERBOSEPRINT(...)                                                      \
-  if (g_bVerbose) {                                                            \
-    _tprintf(__VA_ARGS__);                                                     \
+#define VERBOSEPRINT(...)  \
+  if (g_bVerbose)          \
+  {                        \
+    _tprintf(__VA_ARGS__); \
   }
-#define QUIETPRINT(...)                                                        \
-  if (!g_bQuiet) {                                                             \
-    _tprintf(__VA_ARGS__);                                                     \
+#define QUIETPRINT(...)    \
+  if (!g_bQuiet)           \
+  {                        \
+    _tprintf(__VA_ARGS__); \
   }
 
 //*****************************************************************************
@@ -90,7 +92,8 @@ extern DCB port;
 // Returns 0 on success or a positive error return code on failure.
 //
 //*****************************************************************************
-int f05_DownloadImage(void) {
+int f05_DownloadImage(void)
+{
   FILE *Kfh;
   FILE *Afh;
 
@@ -120,7 +123,8 @@ int f05_DownloadImage(void) {
 #else
   error = _wfopen_s(&Kfh, g_pszKernelFile, _T("rb"));
 #endif
-  if (!Kfh) {
+  if (!Kfh)
+  {
     QUIETPRINT(_T("Unable to open Kernel file %s. Does it exist?\n"),
                g_pszKernelFile);
     return (10);
@@ -132,7 +136,8 @@ int f05_DownloadImage(void) {
 #else
   error = _wfopen_s(&Afh, g_pszAppFile, L"rb");
 #endif
-  if (!Afh) {
+  if (!Afh)
+  {
     QUIETPRINT(_T("Unable to open Application file %s. Does it exist?\n"),
                g_pszAppFile);
     return (10);
@@ -145,21 +150,25 @@ int f05_DownloadImage(void) {
   sendData[0] = 'A';
 #ifdef __linux__
   write(fd, &sendData[0], 1);
-  while (dwRead == 0) {
+  while (dwRead == 0)
+  {
 
     readf = read(fd, &buf, 1);
-    if (readf == -1) {
+    if (readf == -1)
+    {
       QUIETPRINT(_T("Error %s\n"), strerror(errno));
     }
     dwRead = readf;
     rcvData = buf[0];
-    if (readf == 0) {
+    if (readf == 0)
+    {
       write(fd, &sendData[0], 1);
     }
   }
 #else
   WriteFile(file, &sendData[0], 1, &dwWritten, NULL);
-  while (dwRead == 0) {
+  while (dwRead == 0)
+  {
     ReadFile(file, &rcvData, 1, &dwRead, NULL);
   }
 #endif
@@ -177,7 +186,8 @@ int f05_DownloadImage(void) {
 
   fileStatus = fscanf_s(Kfh, "%x", &sendData[0]);
   int i = 0;
-  while (fileStatus == 1) {
+  while (fileStatus == 1)
+  {
     i++;
 
     // Send next char
@@ -202,9 +212,12 @@ int f05_DownloadImage(void) {
 #endif
   VERBOSEPRINT(_T("\nDone Waiting for kernel boot...attempting autobaud"));
 #ifdef __linux__
-  if (tcflush(fd, TCIOFLUSH) == 0) {
+  if (tcflush(fd, TCIOFLUSH) == 0)
+  {
     // printf("Input and Output successfully flushed");
-  } else {
+  }
+  else
+  {
     perror("tcflush error");
   }
 #else
@@ -218,10 +231,12 @@ int f05_DownloadImage(void) {
   buf[0] = 0;
   dwRead = 0;
   // int counter = 0 ;
-  while (dwRead == 0) {
+  while (dwRead == 0)
+  {
     // counter++;
     readf = read(fd, &buf, 1);
-    if (readf == -1) {
+    if (readf == -1)
+    {
       QUIETPRINT(_T("Error %s\n"), strerror(errno));
     }
     dwRead = readf;
@@ -230,7 +245,8 @@ int f05_DownloadImage(void) {
 #else
   WriteFile(file, &sendData[0], 1, &dwWritten, NULL);
   dwRead = 0;
-  while (dwRead == 0) {
+  while (dwRead == 0)
+  {
     ReadFile(file, &rcvData, 1, &dwRead, NULL);
   }
 #endif
@@ -246,7 +262,8 @@ int f05_DownloadImage(void) {
 #endif
   getc(Afh);
 
-  while (txCount < 22) {
+  while (txCount < 22)
+  {
     txCount++;
     fscanf_s(Afh, "%x", &sendData[0]);
     checksum += sendData[0];
@@ -258,10 +275,12 @@ int f05_DownloadImage(void) {
 #endif
   }
   dwRead = 0;
-  while (dwRead == 0) {
+  while (dwRead == 0)
+  {
 #ifdef __linux__
     readf = read(fd, &buf, 1);
-    if (readf == -1) {
+    if (readf == -1)
+    {
       QUIETPRINT(_T("Error %s\n"), strerror(errno));
     }
     dwRead = readf;
@@ -271,10 +290,12 @@ int f05_DownloadImage(void) {
 #endif
   }
   dwRead = 0;
-  while (dwRead == 0) {
+  while (dwRead == 0)
+  {
 #ifdef __linux__
     readf = read(fd, &buf, 1);
-    if (readf == -1) {
+    if (readf == -1)
+    {
       QUIETPRINT(_T("Error %s\n"), strerror(errno));
     }
     dwRead = readf;
@@ -299,7 +320,8 @@ int f05_DownloadImage(void) {
   fileStatus = 1;
 
   // Load the flash application
-  while (1) {
+  while (1)
+  {
     fileStatus = fscanf_s(Afh, "%x ", &sendData[0]);
     if (fileStatus == 0)
       break;
@@ -311,9 +333,12 @@ int f05_DownloadImage(void) {
     checksum += sendData[0];
 
     // Get block size
-    if (txCount == 0x00) {
+    if (txCount == 0x00)
+    {
       wordData = sendData[0];
-    } else if (txCount == 0x01) {
+    }
+    else if (txCount == 0x01)
+    {
       byteData = sendData[0];
       // form the wordData from the MSB:LSB
       wordData |= (byteData << 8);
@@ -323,18 +348,22 @@ int f05_DownloadImage(void) {
     totalCount++;
 
     // If the next block size is 0, exit the while loop.
-    if (wordData == 0x00 && txCount > 1) {
+    if (wordData == 0x00 && txCount > 1)
+    {
       wordData = 0x0000;
       byteData = 0x0000;
       break;
     }
     // will execute when all the data in the block has been sent
-    else if (txCount == 2 * (wordData + 3)) {
+    else if (txCount == 2 * (wordData + 3))
+    {
       dwRead = 0;
-      while (dwRead == 0) {
+      while (dwRead == 0)
+      {
 #ifdef __linux__
         readf = read(fd, &buf, 1);
-        if (readf == -1) {
+        if (readf == -1)
+        {
           QUIETPRINT(_T("Error %s\n"), strerror(errno));
         }
         dwRead = readf;
@@ -344,10 +373,12 @@ int f05_DownloadImage(void) {
 #endif
       }
       dwRead = 0;
-      while (dwRead == 0) {
+      while (dwRead == 0)
+      {
 #ifdef __linux__
         readf = read(fd, &buf, 1);
-        if (readf == -1) {
+        if (readf == -1)
+        {
           QUIETPRINT(_T("Error %s\n"), strerror(errno));
         }
         dwRead = readf;
@@ -368,12 +399,15 @@ int f05_DownloadImage(void) {
     }
     // will execute when the flash kernel buffer is full (0x400 words == 0x800
     // bytes)
-    else if ((txCount - 6) % 0x800 == 0 && txCount > 6) {
+    else if ((txCount - 6) % 0x800 == 0 && txCount > 6)
+    {
       dwRead = 0;
-      while (dwRead == 0) {
+      while (dwRead == 0)
+      {
 #ifdef __linux__
         readf = read(fd, &buf, 1);
-        if (readf == -1) {
+        if (readf == -1)
+        {
           QUIETPRINT(_T("Error %s\n"), strerror(errno));
         }
         dwRead = readf;
@@ -383,10 +417,12 @@ int f05_DownloadImage(void) {
 #endif
       }
       dwRead = 0;
-      while (dwRead == 0) {
+      while (dwRead == 0)
+      {
 #ifdef __linux__
         readf = read(fd, &buf, 1);
-        if (readf == -1) {
+        if (readf == -1)
+        {
           QUIETPRINT(_T("Error %s\n"), strerror(errno));
         }
         dwRead = readf;

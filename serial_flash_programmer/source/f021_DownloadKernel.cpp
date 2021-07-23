@@ -2,7 +2,7 @@
 // FILE:   f021_DownloadKernel.cpp
 // TITLE:  Download Kernel function for f021 devices.
 //
-// This function is used to communicate and download with the device.  For 
+// This function is used to communicate and download with the device.  For
 // F021 devices, the serial flash programmer sends the application the same
 // way it does the kernel.  In both instances, the serial flash programmer
 // send one byte and the device echos back that same byte.
@@ -16,14 +16,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 #ifndef __linux__
 #pragma once
 #include <conio.h>
 #include <windows.h>
 #include <dos.h>
 #include <time.h>
-#endif 
+#endif
 
 // Linux exclusive
 #ifdef __linux__
@@ -33,7 +32,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "../linux_macros.h"
-#endif 
+#endif
 
 #include "../include/f021_DownloadKernel.h"
 
@@ -42,8 +41,16 @@
 // Helpful macros for generating output depending upon verbose and quiet flags.
 //
 //*****************************************************************************
-#define VERBOSEPRINT(...) if(g_bVerbose) { _tprintf(__VA_ARGS__); }
-#define QUIETPRINT(...) if(!g_bQuiet) { _tprintf(__VA_ARGS__); }
+#define VERBOSEPRINT(...)      \
+	if (g_bVerbose)            \
+	{                          \
+		_tprintf(__VA_ARGS__); \
+	}
+#define QUIETPRINT(...)        \
+	if (!g_bQuiet)             \
+	{                          \
+		_tprintf(__VA_ARGS__); \
+	}
 
 //*****************************************************************************
 //
@@ -84,7 +91,7 @@ extern DCB port;
 void clearBuffer(void);
 void autobaudLock(void);
 void loadProgram(FILE *fh);
-int f021_DownloadKernel(wchar_t* kernel);
+int f021_DownloadKernel(wchar_t *kernel);
 
 //*****************************************************************************
 //
@@ -92,15 +99,16 @@ int f021_DownloadKernel(wchar_t* kernel);
 //
 //*****************************************************************************
 
-void
-clearBuffer(void)
+void clearBuffer(void)
 {
 
 #ifdef __linux__
-	if (tcflush(fd, TCIOFLUSH) == 0){
+	if (tcflush(fd, TCIOFLUSH) == 0)
+	{
 		QUIETPRINT(_T("Input and Output successfully flushed"));
 	}
-	else{
+	else
+	{
 		perror("tcflush error");
 	}
 #else
@@ -119,8 +127,7 @@ clearBuffer(void)
 // Locks baud rate.
 //
 //*****************************************************************************
-void
-autobaudLock(void)
+void autobaudLock(void)
 {
 	clearBuffer();
 	unsigned char sendData[8];
@@ -136,9 +143,11 @@ autobaudLock(void)
 	wr = write(fd, &sendData[0], 1);
 	buf[0] = 0;
 	dwRead = 0;
-	while (dwRead == 0){
+	while (dwRead == 0)
+	{
 		readf = read(fd, &buf, 1);
-		if (readf == -1){
+		if (readf == -1)
+		{
 			QUIETPRINT(_T("Error %s\n"), strerror(errno));
 		}
 		dwRead = readf;
@@ -147,7 +156,8 @@ autobaudLock(void)
 #else
 	WriteFile(file, &sendData[0], 1, &dwWritten, NULL);
 	dwRead = 0;
-	while (dwRead == 0){
+	while (dwRead == 0)
+	{
 		ReadFile(file, &rcvData, 1, &dwRead, NULL);
 	}
 #endif
@@ -156,7 +166,9 @@ autobaudLock(void)
 		QUIETPRINT(_T("\n%lx"), sendData[0]);
 		QUIETPRINT(_T("==%lx"), rcvData);
 		VERBOSEPRINT(_T("\nError with autobaud lock echoback... Please press Ctrl-C to abort."));
-		while (1){}
+		while (1)
+		{
+		}
 	}
 }
 
@@ -172,8 +184,8 @@ void loadProgram(FILE *fh)
 	unsigned int rcvData = 0;
 	DWORD dwRead;
 #ifdef __linux__
-    unsigned char buf[8];
-    int readf;
+	unsigned char buf[8];
+	int readf;
 #else
 	DWORD dwWritten;
 #endif
@@ -202,22 +214,25 @@ void loadProgram(FILE *fh)
 		while (dwRead == 0)
 		{
 #ifdef __linux__
-            readf = read(fd, &buf, 1);
-            if(readf == -1)
-            {
-		       	QUIETPRINT(_T("Error %s\n"), strerror(errno));
-		    }
-            dwRead = readf;
-		    //rcvDataH = buf[0];
-#else            
-            ReadFile(file, &rcvData, 1, &dwRead, NULL);
+			readf = read(fd, &buf, 1);
+			if (readf == -1)
+			{
+				QUIETPRINT(_T("Error %s\n"), strerror(errno));
+			}
+			dwRead = readf;
+			//rcvDataH = buf[0];
+#else
+			ReadFile(file, &rcvData, 1, &dwRead, NULL);
 #endif
-        }
+		}
 		QUIETPRINT(_T("==%lx"), rcvData);
 		//Ensure data matches
-		if (sendData[0] != rcvData){
+		if (sendData[0] != rcvData)
+		{
 			VERBOSEPRINT(_T("\nData does not match... Please press Ctrl-C to abort."));
-			while (1){}
+			while (1)
+			{
+			}
 		}
 
 		//Read next char
@@ -238,8 +253,7 @@ void loadProgram(FILE *fh)
 // Returns 0 on success or a positive error return code on failure.
 //
 //*****************************************************************************
-int
-f021_DownloadKernel(wchar_t * kernel)
+int f021_DownloadKernel(wchar_t *kernel)
 {
 	FILE *Kfh;
 
@@ -252,7 +266,7 @@ f021_DownloadKernel(wchar_t * kernel)
 #endif
 
 #ifdef __linux__
-    unsigned char buf[8];
+	unsigned char buf[8];
 	int readf;
 	int wr;
 #endif
@@ -260,7 +274,7 @@ f021_DownloadKernel(wchar_t * kernel)
 	QUIETPRINT(_T("Downloading %s to device...\n"), kernel);
 
 	// Opens the Flash Kernel File
-#ifdef  __linux__
+#ifdef __linux__
 	Kfh = fopen(kernel, "rb");
 #else
 	Kfh = _tfopen(kernel, _T("rb"));
@@ -268,10 +282,10 @@ f021_DownloadKernel(wchar_t * kernel)
 	if (!Kfh)
 	{
 		QUIETPRINT(_T("Unable to open Kernel file %s. Does it exist?\n"), kernel);
-		return(10);
+		return (10);
 	}
 
-    //
+	//
 	//Both Kernel, Application, and COM port are open
 	//
 	//Do AutoBaud
@@ -290,5 +304,5 @@ f021_DownloadKernel(wchar_t * kernel)
 
 	VERBOSEPRINT(_T("\nDone waiting for kernel boot... "));
 	clearBuffer();
-	return(0);
+	return (0);
 }

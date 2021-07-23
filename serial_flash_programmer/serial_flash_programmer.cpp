@@ -4,7 +4,7 @@
 //
 // This is demonstration code for use with the Texas Instruments Serial
 // Flash Programmer. It reads data in the boot loader format from an input file,
-// then sends that data to the microcontroller using a COM port. 
+// then sends that data to the microcontroller using a COM port.
 //###########################################################################
 // $TI Release: $
 // $Release Date: $
@@ -53,59 +53,70 @@ void printErrorStatus(uint16_t status);
 // formatting memory address output. Bug fix where 0x80000 would be shown as 80.
 uint32_t formatMemAddr(uint16_t firstHalf, uint16_t secondHalf);
 extern void autobaudLock(void);
-extern int f021_DownloadImage(TCHAR*);
+extern int f021_DownloadImage(TCHAR *);
 extern int f05_DownloadImage(void);
-extern int f021_DownloadKernel(wchar_t* kernel);
-extern uint32_t constructPacket(uint8_t* packet, uint16_t command, uint16_t length, uint8_t * data);
-extern int f021_SendPacket(uint8_t* packet, uint32_t length);
+extern int f021_DownloadKernel(wchar_t *kernel);
+extern uint32_t constructPacket(uint8_t *packet, uint16_t command, uint16_t length, uint8_t *data);
+extern int f021_SendPacket(uint8_t *packet, uint32_t length);
 extern int receiveACK(void);
-extern uint16_t getPacket(uint16_t* length, uint16_t* data);
+extern uint16_t getPacket(uint16_t *length, uint16_t *data);
 extern uint16_t getWord(void);
 
 #ifdef __linux__
 int _kbhit(void)
 {
-  struct termios oldt, newt;
-  int ch;
-  int oldf;
+	struct termios oldt, newt;
+	int ch;
+	int oldf;
 
-  tcgetattr(STDIN_FILENO, &oldt);
-  newt = oldt;
-  newt.c_lflag &= ~(ICANON | ECHO);
-  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-  oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
-  fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+	tcgetattr(STDIN_FILENO, &oldt);
+	newt = oldt;
+	newt.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+	fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
-  ch = getchar();
+	ch = getchar();
 
-  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-  fcntl(STDIN_FILENO, F_SETFL, oldf);
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+	fcntl(STDIN_FILENO, F_SETFL, oldf);
 
-  if(ch != EOF)
-  {
-    ungetc(ch, stdin);
-    return 1;
-  }
+	if (ch != EOF)
+	{
+		ungetc(ch, stdin);
+		return 1;
+	}
 
-  return 0;
+	return 0;
 }
-speed_t get_serial_speed (int speed)
+speed_t get_serial_speed(int speed)
 {
 	switch (speed)
 	{
-		case 300:     return B300;   
-		case 600:     return B600;   
-		case 1200:    return B1200;  
-		case 1800:    return B1800;  
-		case 2400:    return B2400;  
-		case 4800:    return B4800;  
-		case 9600:    return B9600;  
-		case 19200:   return B19200; 
-		case 38400:   return B38400; 
-		case 57600:   return B57600; 
-		case 115200:  return B115200;
-		default:
-			      return -1;
+	case 300:
+		return B300;
+	case 600:
+		return B600;
+	case 1200:
+		return B1200;
+	case 1800:
+		return B1800;
+	case 2400:
+		return B2400;
+	case 4800:
+		return B4800;
+	case 9600:
+		return B9600;
+	case 19200:
+		return B19200;
+	case 38400:
+		return B38400;
+	case 57600:
+		return B57600;
+	case 115200:
+		return B115200;
+	default:
+		return -1;
 	}
 }
 #endif //__linux__
@@ -115,8 +126,16 @@ speed_t get_serial_speed (int speed)
 // Helpful macros for generating output depending upon verbose and quiet flags.
 //
 //*****************************************************************************
-#define VERBOSEPRINT(...) if(g_bVerbose) { _tprintf(__VA_ARGS__); }
-#define QUIETPRINT(...) if(!g_bQuiet) { _tprintf(__VA_ARGS__); }
+#define VERBOSEPRINT(...)      \
+	if (g_bVerbose)            \
+	{                          \
+		_tprintf(__VA_ARGS__); \
+	}
+#define QUIETPRINT(...)        \
+	if (!g_bQuiet)             \
+	{                          \
+		_tprintf(__VA_ARGS__); \
+	}
 
 //*****************************************************************************
 //
@@ -147,7 +166,7 @@ bool g_bf28004x = false;
 //
 //type of Flash that will be used
 //
-bool g_bf021 = false;  //Kernel B, byte-by-byte checksum using status-packets.
+bool g_bf021 = false; //Kernel B, byte-by-byte checksum using status-packets.
 bool g_bf05 = false;  //Kernel A, byte-by-byte checksum, no status-packet.
 
 //
@@ -180,8 +199,8 @@ uint16_t gu16_Command = 0U;
 bool g_bUnlock = false;
 bool g_bUnlockZ1 = false;
 bool g_bUnlockZ2 = false;
-uint32_t gu32_Z1Password[4] = { 0xFFFFFFFF };
-uint32_t gu32_Z2Password[4] = { 0xFFFFFFFF };
+uint32_t gu32_Z1Password[4] = {0xFFFFFFFF};
+uint32_t gu32_Z2Password[4] = {0xFFFFFFFF};
 
 //
 //String names
@@ -207,30 +226,30 @@ DCB port;
 //
 // Defines
 //
-#define DFU_CPU1					0x0100
-#define DFU_CPU2					0x0200
-#define ERASE_CPU1					0x0300
-#define ERASE_CPU2					0x0400
-#define VERIFY_CPU1					0x0500
-#define VERIFY_CPU2					0x0600
-#define LIVE_DFU_CPU1               0x0700
-#define CPU1_UNLOCK_Z1				0x000A
-#define CPU1_UNLOCK_Z2				0x000B
-#define CPU2_UNLOCK_Z1				0x000C
-#define CPU2_UNLOCK_Z2				0x000D
-#define RUN_CPU1					0x000E
-#define RESET_CPU1					0x000F
-#define RUN_CPU1_BOOT_CPU2			0x0004
-#define RESET_CPU1_BOOT_CPU2        0x0007
-#define RUN_CPU2					0x0010
-#define RESET_CPU2					0x0020
+#define DFU_CPU1 0x0100
+#define DFU_CPU2 0x0200
+#define ERASE_CPU1 0x0300
+#define ERASE_CPU2 0x0400
+#define VERIFY_CPU1 0x0500
+#define VERIFY_CPU2 0x0600
+#define LIVE_DFU_CPU1 0x0700
+#define CPU1_UNLOCK_Z1 0x000A
+#define CPU1_UNLOCK_Z2 0x000B
+#define CPU2_UNLOCK_Z1 0x000C
+#define CPU2_UNLOCK_Z2 0x000D
+#define RUN_CPU1 0x000E
+#define RESET_CPU1 0x000F
+#define RUN_CPU1_BOOT_CPU2 0x0004
+#define RESET_CPU1_BOOT_CPU2 0x0007
+#define RUN_CPU2 0x0010
+#define RESET_CPU2 0x0020
 
-#define NO_ERROR					0x1000
-#define BLANK_ERROR					0x2000
-#define VERIFY_ERROR				0x3000
-#define PROGRAM_ERROR				0x4000
-#define COMMAND_ERROR				0x5000
-#define UNLOCK_ERROR				0x6000
+#define NO_ERROR 0x1000
+#define BLANK_ERROR 0x2000
+#define VERIFY_ERROR 0x3000
+#define PROGRAM_ERROR 0x4000
+#define COMMAND_ERROR 0x5000
+#define UNLOCK_ERROR 0x6000
 
 #define kernel
 
@@ -239,8 +258,7 @@ DCB port;
 // The main entry point of the DFU programmer example application.
 //
 //*****************************************************************************
-int
-_tmain(int argc, TCHAR* argv[])
+int _tmain(int argc, TCHAR *argv[])
 {
 	int iExitCode = 0;
 	int iRetCode = 0;
@@ -251,7 +269,8 @@ _tmain(int argc, TCHAR* argv[])
 	//
 	ParseCommandLine(argc, argv);
 
-    if (g_pszKernelFile2 && g_pszAppFile2){
+	if (g_pszKernelFile2 && g_pszAppFile2)
+	{
 		g_bDualCore = TRUE;
 	}
 
@@ -260,10 +279,10 @@ _tmain(int argc, TCHAR* argv[])
 	//
 	//For Linux
 #ifdef __linux__
-	// Get Baud Rate 
+	// Get Baud Rate
 	int speed = atoi(g_pszBaudRate);
 	// Open Port for linux - comes in the form of  dev/ttyUSB#
-	const char * portname = g_pszComPort;
+	const char *portname = g_pszComPort;
 	fd = open(portname, O_RDWR | O_NOCTTY);
 	if (fd == -1)
 	{
@@ -278,15 +297,15 @@ _tmain(int argc, TCHAR* argv[])
 	newtio.c_cflag = CS8 | CLOCAL | CREAD;
 	newtio.c_iflag = IGNPAR;
 	newtio.c_oflag = 0;
-	cfsetospeed(&newtio, get_serial_speed(speed));  //set baudrate
+	cfsetospeed(&newtio, get_serial_speed(speed)); //set baudrate
 	cfsetispeed(&newtio, get_serial_speed(speed));
 	/* set input mode (non-canonical, no echo,...) */
 	newtio.c_lflag = 0;
 
-	newtio.c_cc[VTIME] = 5;   /* inter-character timer unused */
-	newtio.c_cc[VMIN] = 0;   /* blocking read until 5 chars received */
+	newtio.c_cc[VTIME] = 5; /* inter-character timer unused */
+	newtio.c_cc[VMIN] = 0;	/* blocking read until 5 chars received */
 
-	tcflush(fd, TCIFLUSH);   // flushes the input
+	tcflush(fd, TCIFLUSH);			 // flushes the input
 	tcsetattr(fd, TCSANOW, &newtio); // sets the configurations
 
 	//For Windows
@@ -297,15 +316,16 @@ _tmain(int argc, TCHAR* argv[])
 	//Append to COM port name
 	_stprintf(comString, _T("\\\\.\\%s"), g_pszComPort);
 	file = CreateFile((LPCWSTR)comString,
-		GENERIC_READ | GENERIC_WRITE,
-		0,
-		NULL,
-		OPEN_EXISTING,
-		0,
-		NULL);
+					  GENERIC_READ | GENERIC_WRITE,
+					  0,
+					  NULL,
+					  OPEN_EXISTING,
+					  0,
+					  NULL);
 
 	//Check if COM port opened correctly
-	if (INVALID_HANDLE_VALUE == file) {
+	if (INVALID_HANDLE_VALUE == file)
+	{
 		QUIETPRINT(_T("Unable to open COM port %s...does someone else have it open?\n"), g_pszComPort);
 		ExitApp(1);
 	}
@@ -326,7 +346,6 @@ _tmain(int argc, TCHAR* argv[])
 		QUIETPRINT(_T("Problem Getting Comm State \n"));
 		ExitApp(iExitCode);
 	}
-
 
 	iRetCode = BuildCommDCB((LPCTSTR)baudString, &port);
 	if (iRetCode)
@@ -351,7 +370,7 @@ _tmain(int argc, TCHAR* argv[])
 	}
 #endif
 
-	uint8_t* packet = (uint8_t*)malloc(100); 
+	uint8_t *packet = (uint8_t *)malloc(100);
 	uint32_t packetLength;
 
 	/***********************************************************************/
@@ -362,8 +381,8 @@ _tmain(int argc, TCHAR* argv[])
 		//
 #ifdef kernel
 		_tprintf(_T("\ncalling f021_DownloadKernel CPU1 Kernel\n"));
-		iRetCode = f021_DownloadKernel(g_pszKernelFile);  
-#endif 
+		iRetCode = f021_DownloadKernel(g_pszKernelFile);
+#endif
 
 		// added for delay (diff repo/curr copy).
 		Sleep(6);
@@ -436,11 +455,12 @@ _tmain(int argc, TCHAR* argv[])
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2],data[1]) << endl;
+					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
 				}
-				else  //if NO_ERROR then statusCode.address or data[2]|data[1] is the EnrtyAddr
+				else //if NO_ERROR then statusCode.address or data[2]|data[1] is the EnrtyAddr
 				{
-					cout << endl << "Entry Point Address is: 0x" << hex << setw(4) << setfill('0') << data[2] << hex << setw(4) << setfill('0') << data[1] << endl;
+					cout << endl
+						 << "Entry Point Address is: 0x" << hex << setw(4) << setfill('0') << data[2] << hex << setw(4) << setfill('0') << data[1] << endl;
 				}
 				break;
 
@@ -459,7 +479,7 @@ _tmain(int argc, TCHAR* argv[])
 				packetLength = constructPacket(packet, (uint16_t)DFU_CPU2, 0, NULL);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
-				
+
 				iRetCode = f021_DownloadImage(g_pszAppFile2);
 
 				command = getPacket(&length, data);
@@ -473,14 +493,15 @@ _tmain(int argc, TCHAR* argv[])
 					// format mem addr output.
 					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
 				}
-				else  //if NO_ERROR then statusCode.address or data[2]|data[1] is the EnrtyAddr
+				else //if NO_ERROR then statusCode.address or data[2]|data[1] is the EnrtyAddr
 				{
-					cout << endl << "Entry Point Address is: 0x" << hex << setw(4) << setfill('0') << data[2] << hex << setw(4) << setfill('0') << data[1] << endl;
+					cout << endl
+						 << "Entry Point Address is: 0x" << hex << setw(4) << setfill('0') << data[2] << hex << setw(4) << setfill('0') << data[1] << endl;
 				}
 				break;
 
 				//------------------------------------ERASE_CPU1------------------------------//
-			case 3: 
+			case 3:
 				gu32_EraseSectors1 = 0;
 				if (cpu1 == false)
 				{
@@ -491,7 +512,7 @@ _tmain(int argc, TCHAR* argv[])
 				_tprintf(_T("To Erase all of the Sectors type \"ALL\".\n"));
 				_tprintf(_T("First Sector: "));
 				cin >> sector;
-				while (sector.compare("0") && sector.compare( 0, 3, "ALL") )
+				while (sector.compare("0") && sector.compare(0, 3, "ALL"))
 				{
 					setEraseSector(1U, sector[0]);
 					_tprintf(_T("Next Sector:  "));
@@ -501,10 +522,10 @@ _tmain(int argc, TCHAR* argv[])
 				{
 					gu32_EraseSectors1 = 0xFFFFFFFF & gu32_SectorMask;
 				}
-				packetLength = constructPacket(packet, ERASE_CPU1, 4, (uint8_t*)&gu32_EraseSectors1);
+				packetLength = constructPacket(packet, ERASE_CPU1, 4, (uint8_t *)&gu32_EraseSectors1);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
-				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK	
-				
+				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
+
 				command = getPacket(&length, data);
 				if (command != ERASE_CPU1)
 				{
@@ -540,10 +561,10 @@ _tmain(int argc, TCHAR* argv[])
 				{
 					gu32_EraseSectors2 = 0xFFFFFFFF & gu32_SectorMask;
 				}
-				packetLength = constructPacket(packet, ERASE_CPU2, 4, (uint8_t*)&gu32_EraseSectors2);
+				packetLength = constructPacket(packet, ERASE_CPU2, 4, (uint8_t *)&gu32_EraseSectors2);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
-				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK	
-				
+				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
+
 				command = getPacket(&length, data);
 				if (command != ERASE_CPU2)
 				{
@@ -636,10 +657,10 @@ _tmain(int argc, TCHAR* argv[])
 				_tprintf(_T("Zone 1 Password 4th 32-bits: "));
 				cin >> hex >> gu32_Z1Password[3];
 
-				packetLength = constructPacket(packet, (uint16_t)CPU1_UNLOCK_Z1, 16, (uint8_t*)gu32_Z1Password);
+				packetLength = constructPacket(packet, (uint16_t)CPU1_UNLOCK_Z1, 16, (uint8_t *)gu32_Z1Password);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
-				command = getPacket(&length,  data);
+				command = getPacket(&length, data);
 				if (command != CPU1_UNLOCK_Z1)
 				{
 					cout << "ERROR with Packet Command!" << endl;
@@ -652,7 +673,7 @@ _tmain(int argc, TCHAR* argv[])
 				}
 				break;
 
-				//------------------------------------UNLOCK_CPU1_Z2------------------------------//				
+				//------------------------------------UNLOCK_CPU1_Z2------------------------------//
 			case 8:
 				if (cpu1 == false)
 				{
@@ -669,7 +690,7 @@ _tmain(int argc, TCHAR* argv[])
 				_tprintf(_T("Zone 2 Password 4th 32-bits: "));
 				cin >> hex >> gu32_Z2Password[3];
 
-				packetLength = constructPacket(packet, (uint16_t)CPU1_UNLOCK_Z2, 16, (uint8_t*)gu32_Z2Password);
+				packetLength = constructPacket(packet, (uint16_t)CPU1_UNLOCK_Z2, 16, (uint8_t *)gu32_Z2Password);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
 				command = getPacket(&length, data);
@@ -702,7 +723,7 @@ _tmain(int argc, TCHAR* argv[])
 				_tprintf(_T("Zone 1 Password 4th 32-bits: "));
 				cin >> hex >> gu32_Z1Password[3];
 
-				packetLength = constructPacket(packet, (uint16_t)CPU2_UNLOCK_Z1, 16, (uint8_t*)gu32_Z1Password);
+				packetLength = constructPacket(packet, (uint16_t)CPU2_UNLOCK_Z1, 16, (uint8_t *)gu32_Z1Password);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
 				command = getPacket(&length, data);
@@ -718,7 +739,7 @@ _tmain(int argc, TCHAR* argv[])
 				}
 				break;
 
-				//------------------------------------UNLOCK_CPU2_Z2------------------------------//				
+				//------------------------------------UNLOCK_CPU2_Z2------------------------------//
 			case 10:
 				if (cpu2 == false)
 				{
@@ -735,7 +756,7 @@ _tmain(int argc, TCHAR* argv[])
 				_tprintf(_T("Zone 2 Password 4th 32-bits: "));
 				cin >> hex >> gu32_Z2Password[3];
 
-				packetLength = constructPacket(packet, (uint16_t)CPU2_UNLOCK_Z2, 16, (uint8_t*)gu32_Z2Password);
+				packetLength = constructPacket(packet, (uint16_t)CPU2_UNLOCK_Z2, 16, (uint8_t *)gu32_Z2Password);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
 				command = getPacket(&length, data);
@@ -751,7 +772,7 @@ _tmain(int argc, TCHAR* argv[])
 				}
 				break;
 
-				//------------------------------------RUN_CPU1----------------------------------//			
+				//------------------------------------RUN_CPU1----------------------------------//
 			case 11:
 				if (cpu1 == false)
 				{
@@ -760,13 +781,13 @@ _tmain(int argc, TCHAR* argv[])
 				}
 				_tprintf(_T("\nPlease input a hexadecimal address to branch to:  "));
 				cin >> hex >> branchAddress;
-				packetLength = constructPacket(packet, (uint16_t)RUN_CPU1, 4, (uint8_t*)&branchAddress);
+				packetLength = constructPacket(packet, (uint16_t)RUN_CPU1, 4, (uint8_t *)&branchAddress);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
 				ExitApp(5);
 				break;
 
-				//------------------------------------RESET_CPU1---------------------------------//			
+				//------------------------------------RESET_CPU1---------------------------------//
 			case 12:
 				if (cpu1 == false)
 				{
@@ -779,8 +800,8 @@ _tmain(int argc, TCHAR* argv[])
 				ExitApp(5);
 				break;
 
-				//------------------------------------RUN_CPU1_BOOT_CPU2---------------------------------------//	
-			case 13: 
+				//------------------------------------RUN_CPU1_BOOT_CPU2---------------------------------------//
+			case 13:
 				if (!g_pszKernelFile2)
 				{
 					cout << "ERROR: No CPU2 flash kernel provided!" << endl;
@@ -793,7 +814,7 @@ _tmain(int argc, TCHAR* argv[])
 				}
 				_tprintf(_T("\nPlease input a hexadecimal address to branch to:  "));
 				cin >> hex >> branchAddress;
-				packetLength = constructPacket(packet, (uint16_t)RUN_CPU1_BOOT_CPU2, 4, (uint8_t*)&branchAddress);
+				packetLength = constructPacket(packet, (uint16_t)RUN_CPU1_BOOT_CPU2, 4, (uint8_t *)&branchAddress);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
 #ifdef __linux__
@@ -808,7 +829,6 @@ _tmain(int argc, TCHAR* argv[])
 
 				// added for delay (diff repo/curr copy).
 				Sleep(6);
-		
 
 				// Do AutoBaud
 				VERBOSEPRINT(_T("\nAttempting autobaud to send function message..."));
@@ -818,7 +838,7 @@ _tmain(int argc, TCHAR* argv[])
 				cpu1 = false;
 				break;
 
-				//------------------------------------RESET_CPU1_BOOT_CPU2---------------------------------------//	
+				//------------------------------------RESET_CPU1_BOOT_CPU2---------------------------------------//
 			case 14:
 				if (!g_pszKernelFile2)
 				{
@@ -845,7 +865,6 @@ _tmain(int argc, TCHAR* argv[])
 
 				// added for delay (diff repo/curr copy).
 				Sleep(6);
-		
 
 				// Do AutoBaud
 				VERBOSEPRINT(_T("\nAttempting autobaud to send function message..."));
@@ -855,7 +874,7 @@ _tmain(int argc, TCHAR* argv[])
 				cpu1 = false;
 				break;
 
-				//------------------------------------RUN_CPU2----------------------------------//			
+				//------------------------------------RUN_CPU2----------------------------------//
 			case 15:
 				if (cpu2 == false)
 				{
@@ -864,13 +883,13 @@ _tmain(int argc, TCHAR* argv[])
 				}
 				_tprintf(_T("\nPlease input a hexadecimal address to branch to:  "));
 				cin >> hex >> branchAddress;
-				packetLength = constructPacket(packet, (uint16_t)RUN_CPU2, 4, (uint8_t*)&branchAddress);
+				packetLength = constructPacket(packet, (uint16_t)RUN_CPU2, 4, (uint8_t *)&branchAddress);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
 				ExitApp(5);
 				break;
 
-				//------------------------------------RESET_CPU2---------------------------------//			
+				//------------------------------------RESET_CPU2---------------------------------//
 			case 16:
 				if (cpu2 == false)
 				{
@@ -896,9 +915,8 @@ _tmain(int argc, TCHAR* argv[])
 				break;
 			}
 		}
-
 	}
-	else if (g_bf021 == true && (g_bf2807x || g_bf2837xS || g_bf28004x)) 
+	else if (g_bf021 == true && (g_bf2807x || g_bf2837xS || g_bf28004x))
 	{
 		//
 		// Download the Kernel
@@ -906,11 +924,11 @@ _tmain(int argc, TCHAR* argv[])
 #ifdef kernel
 		_tprintf(_T("\ncalling f021_DownloadKernel CPU1 Kernel\n"));
 		iRetCode = f021_DownloadKernel(g_pszKernelFile);
-#endif 
+#endif
 
 		// added for delay (diff repo/curr copy).
 		Sleep(6);
-		
+
 		//
 		// COM port is open
 		//
@@ -971,10 +989,11 @@ _tmain(int argc, TCHAR* argv[])
 					printErrorStatus(data[0]);
 					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
 				}
-				else  //if NO_ERROR then statusCode.address or data[2]|data[1] is the EnrtyAddr
+				else //if NO_ERROR then statusCode.address or data[2]|data[1] is the EnrtyAddr
 				{
 					// format mem addr output.
-					cout << endl << "Entry Point Address is: 0x" << hex << formatMemAddr(data[2],data[1]) << endl;
+					cout << endl
+						 << "Entry Point Address is: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
 				}
 				break;
 
@@ -986,9 +1005,10 @@ _tmain(int argc, TCHAR* argv[])
 					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
 					break;
 				}
-				
+
 				// (0~15 sectors instead of A~P and "END" to stop instead of "0")
-				if (g_bf28004x == true) {
+				if (g_bf28004x == true)
+				{
 					_tprintf(_T("Please input which Sectors you want to erase for CPU1. Type '0' when finished.\n"));
 					_tprintf(_T("A~P: Bank Zero sector 0 to 15. a~p: Bank One sector 0 to 15.\n"));
 					_tprintf(_T("For example, you would put b for Bank One, sector 1.\n"));
@@ -1001,7 +1021,9 @@ _tmain(int argc, TCHAR* argv[])
 						_tprintf(_T("Next Sector:  "));
 						cin >> sector;
 					}
-				} else {
+				}
+				else
+				{
 					_tprintf(_T("Please input which Sectors (Letter) you want to erase for CPU1. Type '0' when finished.\n"));
 					_tprintf(_T("To Erase all of the Sectors type \"ALL\".\n"));
 					_tprintf(_T("First Sector: "));
@@ -1013,14 +1035,14 @@ _tmain(int argc, TCHAR* argv[])
 						cin >> sector;
 					}
 				}
-				
+
 				if (sector == "ALL")
 				{
 					gu32_EraseSectors1 = 0xFFFFFFFF & gu32_SectorMask;
 				}
-				packetLength = constructPacket(packet, ERASE_CPU1, 4, (uint8_t*)&gu32_EraseSectors1);
+				packetLength = constructPacket(packet, ERASE_CPU1, 4, (uint8_t *)&gu32_EraseSectors1);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
-				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK	
+				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
 
 				command = getPacket(&length, data);
 				if (command != ERASE_CPU1)
@@ -1083,7 +1105,7 @@ _tmain(int argc, TCHAR* argv[])
 				_tprintf(_T("Zone 1 Password 4th 32-bits: "));
 				cin >> hex >> gu32_Z1Password[3];
 
-				packetLength = constructPacket(packet, (uint16_t)CPU1_UNLOCK_Z1, 16, (uint8_t*)gu32_Z1Password);
+				packetLength = constructPacket(packet, (uint16_t)CPU1_UNLOCK_Z1, 16, (uint8_t *)gu32_Z1Password);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
 				command = getPacket(&length, data);
@@ -1099,7 +1121,7 @@ _tmain(int argc, TCHAR* argv[])
 				}
 				break;
 
-				//------------------------------------UNLOCK_CPU1_Z2------------------------------//				
+				//------------------------------------UNLOCK_CPU1_Z2------------------------------//
 			case 5:
 				if (cpu1 == false)
 				{
@@ -1116,7 +1138,7 @@ _tmain(int argc, TCHAR* argv[])
 				_tprintf(_T("Zone 2 Password 4th 32-bits: "));
 				cin >> hex >> gu32_Z2Password[3];
 
-				packetLength = constructPacket(packet, (uint16_t)CPU1_UNLOCK_Z2, 16, (uint8_t*)gu32_Z2Password);
+				packetLength = constructPacket(packet, (uint16_t)CPU1_UNLOCK_Z2, 16, (uint8_t *)gu32_Z2Password);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
 				command = getPacket(&length, data);
@@ -1132,7 +1154,7 @@ _tmain(int argc, TCHAR* argv[])
 				}
 				break;
 
-				//------------------------------------RUN_CPU1----------------------------------//			
+				//------------------------------------RUN_CPU1----------------------------------//
 			case 6:
 				if (cpu1 == false)
 				{
@@ -1141,14 +1163,14 @@ _tmain(int argc, TCHAR* argv[])
 				}
 				_tprintf(_T("\nPlease input a hexadecimal address to branch to:  "));
 				cin >> hex >> branchAddress;
-				packetLength = constructPacket(packet, (uint16_t)RUN_CPU1, 4, (uint8_t*)&branchAddress);
+				packetLength = constructPacket(packet, (uint16_t)RUN_CPU1, 4, (uint8_t *)&branchAddress);
 				_tprintf(_T("\ncalling f021_SendPacket\n"));
 				iRetCode = f021_SendPacket(packet, packetLength); //-1 means NACK, 0 means ACK
 				ExitApp(5);
 
 				break;
 
-				//------------------------------------RESET_CPU1---------------------------------//			
+				//------------------------------------RESET_CPU1---------------------------------//
 			case 7:
 				if (cpu1 == false)
 				{
@@ -1213,7 +1235,7 @@ _tmain(int argc, TCHAR* argv[])
 	/***********************************************************************/
 	else if (g_bf05 == true)
 	{
-        //download kernel and application for F05 devices
+		//download kernel and application for F05 devices
 		_tprintf(_T("\ncalling f05_DownloadImage\n"));
 		iRetCode = f05_DownloadImage();
 	}
@@ -1229,8 +1251,7 @@ _tmain(int argc, TCHAR* argv[])
 // Exit the application, optionally pausing for a key press first.
 //
 //*****************************************************************************
-void
-ExitApp(int iRetcode)
+void ExitApp(int iRetcode)
 {
 	//
 	// Has the caller asked us to pause before exiting?
@@ -1254,8 +1275,7 @@ ExitApp(int iRetcode)
 // Display the welcome banner when the program is started.
 //
 //*****************************************************************************
-void
-PrintWelcome(void)
+void PrintWelcome(void)
 {
 	if (g_bQuiet)
 	{
@@ -1271,8 +1291,7 @@ PrintWelcome(void)
 // Show help on the application command line parameters.
 //
 //*****************************************************************************
-void
-ShowHelp(void)
+void ShowHelp(void)
 {
 	//
 	// Only print help if we are not in quiet mode.
@@ -1286,10 +1305,10 @@ ShowHelp(void)
 	_tprintf(_T("C2000 microcontroller in the SCI boot mode.\n\n"));
 	_tprintf(_T("Supported parameters are:\n\n"));
 	_tprintf(_T("-d <device>   - The name of the device to load to.\n"));
-	_tprintf(_T("               f2802x, f2803x, f2805x, f2806x, f2837xD, f2837xS, f2807x, or f28004x.\n")); 
+	_tprintf(_T("               f2802x, f2803x, f2805x, f2806x, f2837xD, f2837xS, f2807x, or f28004x.\n"));
 	_tprintf(_T("-k <file>     - The file name for flash kernel.\n"));
 	_tprintf(_T("               This file must be in the SCI boot format.\n"));
-    _tprintf(_T("-a <file>     - The file name for download use.\n"));
+	_tprintf(_T("-a <file>     - The file name for download use.\n"));
 	_tprintf(_T("               This file must be in the SCI boot format.\n"));
 	_tprintf(_T("-p COM<num>   - Set the COM port to be used for communications.\n"));
 	_tprintf(_T("-b <num>      - Set the baud rate for the COM port.\n"));
@@ -1316,8 +1335,7 @@ ShowHelp(void)
 // Returns 0 on success. On failure, calls ExitApp(1).
 //
 //*****************************************************************************
-int
-ParseCommandLine(int argc, TCHAR *argv[])
+int ParseCommandLine(int argc, TCHAR *argv[])
 {
 	int iParm;
 	bool bShowHelp;
@@ -1330,7 +1348,7 @@ ParseCommandLine(int argc, TCHAR *argv[])
 
 	// Set the default baud rate
 #ifdef __linux__
-    g_pszBaudRate = (char *)"9600";
+	g_pszBaudRate = (char *)"9600";
 #else
 	g_pszBaudRate = L"9600";
 #endif
@@ -1346,7 +1364,7 @@ ParseCommandLine(int argc, TCHAR *argv[])
 		if (!argv || ((argv[iParm][0] != L'-') && (argv[iParm][0] != L'/')) ||
 			(argv[iParm][1] == L'\0'))
 		{
-        	//
+			//
 			// We found something on the command line that didn't look like a
 			// switch so ExitApp.
 			//
@@ -1357,8 +1375,8 @@ ParseCommandLine(int argc, TCHAR *argv[])
 		{
 			//
 			// Get a pointer to the next argument since it may be used
-			// as a parameter for the case statements 
-            //
+			// as a parameter for the case statements
+			//
 			pcOptArg = ((iParm + 1) < argc) ? argv[iParm + 1] : NULL;
 		}
 
@@ -1410,7 +1428,7 @@ ParseCommandLine(int argc, TCHAR *argv[])
 
 		case 'w':
 			g_bWaitOnExit = TRUE;
-			break;		
+			break;
 
 		case '?':
 		case 'h':
@@ -1421,7 +1439,6 @@ ParseCommandLine(int argc, TCHAR *argv[])
 			_tprintf(_T("Unrecognized argument: %s\n\n"), argv[iParm]);
 			ShowHelp();
 			ExitApp(1);
-
 		}
 	}
 
@@ -1440,8 +1457,8 @@ ParseCommandLine(int argc, TCHAR *argv[])
 	}
 
 	checkErrors();
-	
-	return(0);
+
+	return (0);
 }
 
 void setDeviceName(void)
@@ -1449,13 +1466,9 @@ void setDeviceName(void)
 	// if not a proper input device name
 	// 0 == false, !false = !0 = true. strncmp && wcsncmp returns !0 = true if different.
 #ifdef __linux__
-	if (strncmp(g_pszDeviceName, "f2802x", 6) && strncmp(g_pszDeviceName, "f2803x", 6) && strncmp(g_pszDeviceName, "f2805x", 6) 
-         && strncmp(g_pszDeviceName, "f2806x", 6) && strncmp(g_pszDeviceName, "f2837xD", 7) && strncmp(g_pszDeviceName, "f2837xS", 7) 
-         && strncmp(g_pszDeviceName, "f2807x", 6) && strncmp(g_pszDeviceName, "f28004x", 7) )
+	if (strncmp(g_pszDeviceName, "f2802x", 6) && strncmp(g_pszDeviceName, "f2803x", 6) && strncmp(g_pszDeviceName, "f2805x", 6) && strncmp(g_pszDeviceName, "f2806x", 6) && strncmp(g_pszDeviceName, "f2837xD", 7) && strncmp(g_pszDeviceName, "f2837xS", 7) && strncmp(g_pszDeviceName, "f2807x", 6) && strncmp(g_pszDeviceName, "f28004x", 7))
 #else
-	if (wcsncmp(g_pszDeviceName, (wchar_t*)L"f2802x", 6) && wcsncmp(g_pszDeviceName, (wchar_t*)L"f2803x", 6) && wcsncmp(g_pszDeviceName, (wchar_t*)L"f2805x", 6)
-         && wcsncmp(g_pszDeviceName, (wchar_t*)L"f2806x", 6) && wcsncmp(g_pszDeviceName, (wchar_t*)L"f2837xD", 7) && wcsncmp(g_pszDeviceName, (wchar_t*)L"f2837xS", 7)
-         && wcsncmp(g_pszDeviceName, (wchar_t*)L"f2807x", 6) && wcsncmp(g_pszDeviceName, (wchar_t*)L"f28004x", 7))
+	if (wcsncmp(g_pszDeviceName, (wchar_t *)L"f2802x", 6) && wcsncmp(g_pszDeviceName, (wchar_t *)L"f2803x", 6) && wcsncmp(g_pszDeviceName, (wchar_t *)L"f2805x", 6) && wcsncmp(g_pszDeviceName, (wchar_t *)L"f2806x", 6) && wcsncmp(g_pszDeviceName, (wchar_t *)L"f2837xD", 7) && wcsncmp(g_pszDeviceName, (wchar_t *)L"f2837xS", 7) && wcsncmp(g_pszDeviceName, (wchar_t *)L"f2807x", 6) && wcsncmp(g_pszDeviceName, (wchar_t *)L"f28004x", 7))
 #endif
 	{
 		_tprintf(_T("\nUnrecognized device name: X%sX\n\n"), g_pszDeviceName);
@@ -1466,7 +1479,7 @@ void setDeviceName(void)
 #ifdef __linux__
 	else if (!strncmp(g_pszDeviceName, "f2802x", 6))
 #else
-	else if (!wcsncmp(g_pszDeviceName, (wchar_t*)L"f2802x", 6))
+	else if (!wcsncmp(g_pszDeviceName, (wchar_t *)L"f2802x", 6))
 #endif
 	{
 		g_bf05 = true;
@@ -1476,7 +1489,7 @@ void setDeviceName(void)
 #ifdef __linux__
 	else if (!strncmp(g_pszDeviceName, "f2803x", 6))
 #else
-	else if (!wcsncmp(g_pszDeviceName, (wchar_t*)L"f2803x", 6))
+	else if (!wcsncmp(g_pszDeviceName, (wchar_t *)L"f2803x", 6))
 #endif
 	{
 		g_bf05 = true;
@@ -1486,7 +1499,7 @@ void setDeviceName(void)
 #ifdef __linux__
 	else if (!strncmp(g_pszDeviceName, "f2805x", 6))
 #else
-	else if (!wcsncmp(g_pszDeviceName, (wchar_t*)L"f2805x", 6))
+	else if (!wcsncmp(g_pszDeviceName, (wchar_t *)L"f2805x", 6))
 #endif
 	{
 		g_bf05 = true;
@@ -1496,7 +1509,7 @@ void setDeviceName(void)
 #ifdef __linux__
 	else if (!strncmp(g_pszDeviceName, "f2806x", 6))
 #else
-	else if (!wcsncmp(g_pszDeviceName, (wchar_t*)L"f2806x", 6))
+	else if (!wcsncmp(g_pszDeviceName, (wchar_t *)L"f2806x", 6))
 #endif
 	{
 		g_bf05 = true;
@@ -1506,7 +1519,7 @@ void setDeviceName(void)
 #ifdef __linux__
 	else if (!strncmp(g_pszDeviceName, "f2837xD", 7))
 #else
-	else if (!wcsncmp(g_pszDeviceName, (wchar_t*)L"f2837xD", 7))
+	else if (!wcsncmp(g_pszDeviceName, (wchar_t *)L"f2837xD", 7))
 #endif
 	{
 		g_bf021 = true;
@@ -1516,27 +1529,27 @@ void setDeviceName(void)
 #ifdef __linux__
 	else if (!strncmp(g_pszDeviceName, "f2837xS", 7))
 #else
-	else if (!wcsncmp(g_pszDeviceName, (wchar_t*)L"f2837xS", 7))
+	else if (!wcsncmp(g_pszDeviceName, (wchar_t *)L"f2837xS", 7))
 #endif
 	{
 		g_bf021 = true;
 		g_bf2837xS = true;
-		gu32_SectorMask = 0x3FFF; //14 sectors, N 
+		gu32_SectorMask = 0x3FFF; //14 sectors, N
 	}
 #ifdef __linux__
 	else if (!strncmp(g_pszDeviceName, "f2807x", 6))
 #else
-	else if (!wcsncmp(g_pszDeviceName, (wchar_t*)L"f2807x", 6))
+	else if (!wcsncmp(g_pszDeviceName, (wchar_t *)L"f2807x", 6))
 #endif
 	{
 		g_bf021 = true;
 		g_bf2807x = true;
 		gu32_SectorMask = 0x1FFF; //13 sectors, M
 	}
-#ifdef __linux__ 
+#ifdef __linux__
 	else if (!strncmp(g_pszDeviceName, "f28004x", 7))
 #else
-	else if (!wcsncmp(g_pszDeviceName, (wchar_t*)L"f28004x", 7))
+	else if (!wcsncmp(g_pszDeviceName, (wchar_t *)L"f28004x", 7))
 #endif
 	{
 		g_bf021 = true;
@@ -1548,13 +1561,13 @@ void setDeviceName(void)
 		QUIETPRINT(_T("ERROR: Device name is not recognized.\n"));
 		ExitApp(7);
 	}
-    return;
+	return;
 }
 
 void setEraseSector(unsigned int CPU, uint32_t Sector)
 {
 	//get the correct EraseSectors variable
-	uint32_t * ptr_EraseSectors;
+	uint32_t *ptr_EraseSectors;
 	unsigned int sector;
 
 	if (CPU == 1U)
@@ -1568,23 +1581,31 @@ void setEraseSector(unsigned int CPU, uint32_t Sector)
 	//assign the Sector be erased to the de-referenced pointer
 	// A : P / a : p to 1 : 32 mapping for Flash sectors.
 
-	if (g_bf28004x == true) {
+	if (g_bf28004x == true)
+	{
 		// ASCII 65~80 is A~P, 97~112 is a~p.
-		if (Sector >= 97 && Sector <= 112) {
+		if (Sector >= 97 && Sector <= 112)
+		{
 			// lower case. a, 97 maps to 17.
 			sector = Sector - 80;
-		} else if (Sector >= 65 && Sector <= 80) {
+		}
+		else if (Sector >= 65 && Sector <= 80)
+		{
 			sector = Sector - 64;
-		} else {
+		}
+		else
+		{
 			// user has put something else than A~P/a~p
 			sector = 0;
 		}
-	} else {
+	}
+	else
+	{
 		// "A" ASCII value = 65.
 		sector = Sector - 64;
 	}
-	
-	if (sector >= 1 && sector <= 32) //the Capital Letter: A-P // 1~32 
+
+	if (sector >= 1 && sector <= 32) //the Capital Letter: A-P // 1~32
 	{
 		// setting which sector to erase.
 		unsigned int shift = sector - 1;
@@ -1593,12 +1614,14 @@ void setEraseSector(unsigned int CPU, uint32_t Sector)
 	}
 	else
 	{
-		if (g_bf28004x == true) {
+		if (g_bf28004x == true)
+		{
 			QUIETPRINT(_T("ERROR: Sector is out of range.  Please use <A-P>(Bank Zero 0~15) or <a-p>(Bank One 0~15) to specify which sectors to erase.\n"));
-		} else {
+		}
+		else
+		{
 			QUIETPRINT(_T("ERROR: Sector is out of range.  Please use a capital letter <A-Z> to specify which sectors to erase.\n"));
 		}
-
 	}
 	return;
 }
@@ -1615,7 +1638,6 @@ void checkErrors(void)
 		//
 		ShowHelp();
 		QUIETPRINT(_T("ERROR: No COM port number was specified. Please use -p to provide one.\n"));
-
 	}
 	//
 	// Catch no CPU1 Kernel
@@ -1660,7 +1682,8 @@ void printErrorStatus(uint16_t status)
 // Memory address output bug fix. ex) 80 -> 0x80000
 //
 //*****************************************************************************
-uint32_t formatMemAddr(uint16_t firstHalf, uint16_t secondHalf) {
+uint32_t formatMemAddr(uint16_t firstHalf, uint16_t secondHalf)
+{
 	uint32_t formatted = 0;
 
 	formatted |= (firstHalf << 16);

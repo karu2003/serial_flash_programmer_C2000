@@ -2,7 +2,7 @@
 // FILE:   f021_DownloadIimage.cpp
 // TITLE:  Download Image function for f021 devices.
 //
-// This function is used to communicate and download with the device.  For 
+// This function is used to communicate and download with the device.  For
 // F021 devices, the serial flash programmer sends the application the same
 // way it does the kernel.  In both instances, the serial flash programmer
 // send one byte and the device echos back that same byte.
@@ -38,14 +38,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 //*****************************************************************************
 //
 // Helpful macros for generating output depending upon verbose and quiet flags.
 //
 //*****************************************************************************
-#define VERBOSEPRINT(...) if(g_bVerbose) { _tprintf(__VA_ARGS__); }
-#define QUIETPRINT(...) if(!g_bQuiet) { _tprintf(__VA_ARGS__); }
+#define VERBOSEPRINT(...)      \
+	if (g_bVerbose)            \
+	{                          \
+		_tprintf(__VA_ARGS__); \
+	}
+#define QUIETPRINT(...)        \
+	if (!g_bQuiet)             \
+	{                          \
+		_tprintf(__VA_ARGS__); \
+	}
 
 //*****************************************************************************
 //
@@ -88,7 +95,7 @@ extern void clearBuffer(void);
 extern void autobaudLock(void);
 extern void loadProgram(FILE *fh);
 extern int f021_SendFunctionMessage(uint8_t message);
-int f021_DownloadImage(wchar_t* applicationFile);
+int f021_DownloadImage(wchar_t *applicationFile);
 
 //*****************************************************************************
 //
@@ -155,7 +162,9 @@ void loadProgram_checksum(FILE *fh)
 	if (checksum != rcvData)
 	{
 		VERBOSEPRINT(_T("\nChecksum does not match... Please press Ctrl-C to abort."));
-		while (1){}
+		while (1)
+		{
+		}
 	}
 
 	while (fileStatus == 1)
@@ -189,7 +198,7 @@ void loadProgram_checksum(FILE *fh)
 		fileStatus = fscanf_s(fh, "%x", &sendData[2]); //LSW[7:0]
 		fileStatus = fscanf_s(fh, "%x", &sendData[3]); //LSW[15:8]
 		unsigned long destAddr = (sendData[1] << 24) | (sendData[0] << 16) |
-			(sendData[3] << 8) | (sendData[2]);
+								 (sendData[3] << 8) | (sendData[2]);
 
 		//Send destination address MSW[23:16]
 		WriteFile(file, &sendData[0], 1, &dwWritten, NULL);
@@ -241,7 +250,9 @@ void loadProgram_checksum(FILE *fh)
 				if ((checksum & 0xFFFF) != rcvData)
 				{
 					VERBOSEPRINT(_T("\nChecksum does not match... Please press Ctrl-C to abort."));
-					while (1){}
+					while (1)
+					{
+					}
 				}
 			}
 
@@ -281,7 +292,9 @@ void loadProgram_checksum(FILE *fh)
 		if ((checksum & 0xFFFF) != rcvData)
 		{
 			VERBOSEPRINT(_T("\nChecksum does not match... Please press Ctrl-C to abort."));
-			while (1){}
+			while (1)
+			{
+			}
 		}
 	}
 	millis = GetTickCount() - millis;
@@ -291,7 +304,7 @@ void loadProgram_checksum(FILE *fh)
 }
 #endif // __linux__
 
-int f021_DownloadImage(wchar_t* applicationFile)
+int f021_DownloadImage(wchar_t *applicationFile)
 {
 	FILE *Afh;
 	unsigned int rcvData = 0;
@@ -303,23 +316,23 @@ int f021_DownloadImage(wchar_t* applicationFile)
 #endif
 
 #ifdef __linux__
-    unsigned char buf[8];
+	unsigned char buf[8];
 	int readf;
 	int wr;
 #endif
 
 	QUIETPRINT(_T("Downloading %s to device...\n"), applicationFile);
 
-    //Opens the application file 
+	//Opens the application file
 #ifdef __linux__
-    Afh = fopen(applicationFile, "rb");
+	Afh = fopen(applicationFile, "rb");
 #else
 	Afh = _tfopen(applicationFile, L"rb");
 #endif
 	if (!Afh)
 	{
 		QUIETPRINT(_T("Unable to open Application file %s. Does it exist?\n"), applicationFile);
-		return(-1);
+		return (-1);
 	}
 
 #if checksum_enable
@@ -332,5 +345,5 @@ int f021_DownloadImage(wchar_t* applicationFile)
 
 	VERBOSEPRINT(_T("\nDone waiting for application to download and boot... "));
 	clearBuffer();
-	return(1);
+	return (1);
 }
