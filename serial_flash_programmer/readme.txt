@@ -8,6 +8,8 @@ to run on linux machines.
 
 The resulting serial_flash_programmer.exe should be run from the command line.
 
+For build in Windows it need Visual Studio 2017 BuildTools.
+
 base on C2000Ware_1_00_06_00.
 
 Build on Linux
