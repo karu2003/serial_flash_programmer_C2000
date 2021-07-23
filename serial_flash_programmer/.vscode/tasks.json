@@ -1,0 +1,58 @@
+{
+    "version": "2.0.0",
+    "windows": {
+        "command": "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe",
+        // "command": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    },
+    "linux": {
+        "command": "bash",
+        "args": [
+            "-c"
+        ],
+    },
+    "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+    },
+    "tasks": [
+        {
+            "label": "cmake",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
+            "args": [
+                "cmake .."
+            ]
+        },
+        {
+            "label": "make",
+            "type": "shell",
+            "windows": {
+                "command": "C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin/MSBuild.exe",
+                "args": [
+                    "/property:GenerateFullPaths=true",
+                    "/t:build",
+                    "/property:Configuration=Release"
+                ],
+                "problemMatcher": "$msCompile"
+            },
+            "linux": {
+                "args": [
+                    "make -j 8"
+                ],
+                "options": {
+                    "cwd": "${workspaceRoot}/build"
+                },
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "problemMatcher": "$gcc"
+            },        
+
+        }
+    ]
+}
