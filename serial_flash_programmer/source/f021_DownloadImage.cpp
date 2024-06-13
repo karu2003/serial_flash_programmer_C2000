@@ -324,7 +324,7 @@ void loadProgram_checksum(FILE *fh)
 						QUIETPRINT(_T("Error %s\n"), strerror(errno));
 					}
 					dwRead = readf;
-					sendData[0] = buf[0];
+					sendData[1] = buf[0];
 #else
 					ReadFile(file, &sendData[1], 1, &dwRead, NULL);
 #endif
