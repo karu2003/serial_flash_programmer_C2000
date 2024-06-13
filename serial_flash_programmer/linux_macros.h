@@ -12,6 +12,7 @@
 
 #include <sys/time.h>
 #include <wchar.h>
+#include <stdio.h>
 
 #define TRUE true
 #define FALSE false
