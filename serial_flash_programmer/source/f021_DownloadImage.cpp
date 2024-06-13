@@ -373,7 +373,17 @@ void loadProgram_checksum(FILE *fh)
 		dwRead = 0;
 		while (dwRead == 0)
 		{
+#ifdef __linux__
+        			readf = read(fd, &buf, 1);
+					if (readf == -1)
+					{
+						QUIETPRINT(_T("Error %s\n"), strerror(errno));
+					}
+					dwRead = readf;
+					sendData[0] = buf[0];
+#else
 			ReadFile(file, &sendData[0], 1, &dwRead, NULL);
+#endif
 		}
 		//Send ACK as expected
 #ifdef __linux__
