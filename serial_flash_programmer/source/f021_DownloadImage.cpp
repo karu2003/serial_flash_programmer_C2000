@@ -108,7 +108,7 @@ int f021_DownloadImage(wchar_t *applicationFile);
 // Returns -1 on failure.
 //
 //*****************************************************************************
-#ifndef __linux__
+// #ifndef __linux__
 #define checksum_enable 1
 #define g_bBlockSize 0x80 //number of words transmitted until checksum
 #include <assert.h>
@@ -122,9 +122,16 @@ void loadProgram_checksum(FILE *fh)
 	char ack = 0x2D;
 	assert(g_bBlockSize % 4 == 0); //because ECC uses multiple of 64 bits, or 4 words. % 4 == 0
 	DWORD dwWritten;
+#ifdef __linux__
+    unsigned char buf[8];
+	int readf;
+#endif
 
+#ifdef __linux__
 	getc(fh);
 	getc(fh);
+#endif
+
 	getc(fh);
 
 	float bitRate = 0;
@@ -134,7 +141,11 @@ void loadProgram_checksum(FILE *fh)
 	{
 		fileStatus = fscanf_s(fh, "%x", &sendData[0]);
 		//Send next char
+#ifdef __linux__
+        write(fd, &sendData[0], 1);
+#else	
 		WriteFile(file, &sendData[0], 1, &dwWritten, NULL);
+#endif
 		bitRate += 8;
 		checksum += sendData[0];
 	}
@@ -143,19 +154,47 @@ void loadProgram_checksum(FILE *fh)
 	dwRead = 0;
 	while (dwRead == 0)
 	{
+#ifdef __linux__
+        readf = read(fd, &buf, 1);
+		if (readf == -1)
+		{
+			QUIETPRINT(_T("Error %s\n"), strerror(errno));
+		}
+		dwRead = readf;
+		sendData[0] = buf[0];
+#else
 		ReadFile(file, &sendData[0], 1, &dwRead, NULL);
+#endif
 	}
 	//Send ACK as expected
+#ifdef __linux__
+    write(fd, &ack, 1);
+#else
 	WriteFile(file, &ack, 1, &dwWritten, NULL);
+#endif
 
 	//Receive MSB from checksum
 	dwRead = 0;
 	while (dwRead == 0)
 	{
+#ifdef __linux__
+        readf = read(fd, &buf, 1);
+		if (readf == -1)
+		{
+			QUIETPRINT(_T("Error %s\n"), strerror(errno));
+		}
+		dwRead = readf;
+		sendData[1] = buf[0];
+#else
 		ReadFile(file, &sendData[1], 1, &dwRead, NULL);
+#endif
 	}
 	//Send ACK as expected
+#ifdef __linux__
+    write(fd, &ack, 1);
+#else
 	WriteFile(file, &ack, 1, &dwWritten, NULL);
+#endif
 
 	rcvData = (sendData[1] << 8) + sendData[0];
 	//Ensure checksum matches
@@ -176,13 +215,21 @@ void loadProgram_checksum(FILE *fh)
 		blockSize = (sendData[1] << 8) | sendData[0];
 
 		//Send block size LSB
+#ifdef __linux__
+		write(fd, &sendData[0], 1);
+#else
 		WriteFile(file, &sendData[0], 1, &dwWritten, NULL);
+#endif
 		QUIETPRINT(_T("\n%lx"), sendData[0]);
 		checksum += sendData[0];
 		bitRate += 8;
 
 		//Send block size MSB
+#ifdef __linux__
+		write(fd, &sendData[1], 1);
+#else
 		WriteFile(file, &sendData[1], 1, &dwWritten, NULL);
+#endif
 		QUIETPRINT(_T("\n%lx"), sendData[1]);
 		checksum += sendData[1];
 		bitRate += 8;
@@ -201,25 +248,41 @@ void loadProgram_checksum(FILE *fh)
 								 (sendData[3] << 8) | (sendData[2]);
 
 		//Send destination address MSW[23:16]
+#ifdef __linux__
+		write(fd, &sendData[0], 1);
+#else
 		WriteFile(file, &sendData[0], 1, &dwWritten, NULL);
+#endif
 		QUIETPRINT(_T("\n%lx"), sendData[0]);
 		checksum += sendData[0];
 		bitRate += 8;
 
 		//Send destination address MSW[31:24]
+#ifdef __linux__
+		write(fd, &sendData[1], 1);
+#else
 		WriteFile(file, &sendData[1], 1, &dwWritten, NULL);
+#endif
 		QUIETPRINT(_T("\n%lx"), sendData[1]);
 		checksum += sendData[1];
 		bitRate += 8;
 
 		//Send block size LSW[7:0]
+#ifdef __linux__
+		write(fd, &sendData[2], 1);
+#else
 		WriteFile(file, &sendData[2], 1, &dwWritten, NULL);
+#endif
 		QUIETPRINT(_T("\n%lx"), sendData[2]);
 		checksum += sendData[2];
 		bitRate += 8;
 
 		//Send block size LSW[15:8]
+#ifdef __linux__
+		write(fd, &sendData[3], 1);
+#else
 		WriteFile(file, &sendData[3], 1, &dwWritten, NULL);
+#endif
 		QUIETPRINT(_T("\n%lx"), sendData[3]);
 		checksum += sendData[3];
 		bitRate += 8;
@@ -232,18 +295,46 @@ void loadProgram_checksum(FILE *fh)
 				dwRead = 0;
 				while (dwRead == 0)
 				{
+#ifdef __linux__
+        			readf = read(fd, &buf, 1);
+					if (readf == -1)
+					{
+						QUIETPRINT(_T("Error %s\n"), strerror(errno));
+					}
+					dwRead = readf;
+					sendData[0] = buf[0];
+#else
 					ReadFile(file, &sendData[0], 1, &dwRead, NULL);
+#endif
 				}
 				//Send ACK as expected
+#ifdef __linux__
+    			write(fd, &ack, 1);
+#else
 				WriteFile(file, &ack, 1, &dwWritten, NULL);
+#endif
 				//receive checksum MSB
 				dwRead = 0;
 				while (dwRead == 0)
 				{
+#ifdef __linux__
+        			readf = read(fd, &buf, 1);
+					if (readf == -1)
+					{
+						QUIETPRINT(_T("Error %s\n"), strerror(errno));
+					}
+					dwRead = readf;
+					sendData[0] = buf[0];
+#else
 					ReadFile(file, &sendData[1], 1, &dwRead, NULL);
+#endif
 				}
 				//Send ACK as expected
+#ifdef __linux__
+    			write(fd, &ack, 1);
+#else
 				WriteFile(file, &ack, 1, &dwWritten, NULL);
+#endif
 
 				rcvData = sendData[0] | (sendData[1] << 8);
 				//Ensure checksum matches
@@ -258,14 +349,22 @@ void loadProgram_checksum(FILE *fh)
 
 			//send LSB of word data
 			fileStatus = fscanf_s(fh, "%x", &sendData[0]);
+#ifdef __linux__
+			write(fd, &sendData[0], 1);
+#else
 			WriteFile(file, &sendData[0], 1, &dwWritten, NULL);
+#endif
 			QUIETPRINT(_T("\n%lx"), sendData[0]);
 			checksum += sendData[0];
 			bitRate += 8;
 
 			//send MSB of word data
 			fileStatus = fscanf_s(fh, "%x", &sendData[0]);
+#ifdef __linux__
+			write(fd, &sendData[0], 1);
+#else
 			WriteFile(file, &sendData[0], 1, &dwWritten, NULL);
+#endif
 			QUIETPRINT(_T("\n%lx"), sendData[0]);
 			checksum += sendData[0];
 			bitRate += 8;
@@ -277,15 +376,33 @@ void loadProgram_checksum(FILE *fh)
 			ReadFile(file, &sendData[0], 1, &dwRead, NULL);
 		}
 		//Send ACK as expected
+#ifdef __linux__
+    	write(fd, &ack, 1);
+#else
 		WriteFile(file, &ack, 1, &dwWritten, NULL);
+#endif
 		//receive checksum MSB
 		dwRead = 0;
 		while (dwRead == 0)
 		{
+#ifdef __linux__
+       		readf = read(fd, &buf, 1);
+			if (readf == -1)
+			{
+				QUIETPRINT(_T("Error %s\n"), strerror(errno));
+			}
+			dwRead = readf;
+			sendData[1] = buf[0];
+#else
 			ReadFile(file, &sendData[1], 1, &dwRead, NULL);
+#endif
 		}
 		//Send ACK as expected
+#ifdef __linux__
+    	write(fd, &ack, 1);
+#else
 		WriteFile(file, &ack, 1, &dwWritten, NULL);
+#endif
 
 		rcvData = sendData[0] | (sendData[1] << 8);
 		//Ensure checksum matches
@@ -302,7 +419,7 @@ void loadProgram_checksum(FILE *fh)
 	QUIETPRINT(_T("\nBit rate /s of transfer was: %f"), bitRate);
 	rcvData = 0;
 }
-#endif // __linux__
+// #endif // __linux__
 
 int f021_DownloadImage(wchar_t *applicationFile)
 {
