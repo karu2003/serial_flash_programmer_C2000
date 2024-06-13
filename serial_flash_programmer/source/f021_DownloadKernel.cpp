@@ -220,7 +220,7 @@ void loadProgram(FILE *fh)
 				QUIETPRINT(_T("Error %s\n"), strerror(errno));
 			}
 			dwRead = readf;
-			//rcvDataH = buf[0];
+			rcvData = buf[0];
 #else
 			ReadFile(file, &rcvData, 1, &dwRead, NULL);
 #endif
