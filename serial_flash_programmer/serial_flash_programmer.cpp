@@ -432,12 +432,12 @@ int _tmain(int argc, TCHAR *argv[])
 			case 1:
 				if (!g_pszAppFile)
 				{
-					cout << "ERROR: No flash application specified for CPU1 Flash Programming!" << endl;
+					_tprintf(_T("ERROR: No flash application specified for CPU1 Flash Programming!\n"));
 					ExitApp(3);
 				}
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				packetLength = constructPacket(packet, (uint16_t)DFU_CPU1, 0, NULL);
@@ -449,18 +449,17 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != DFU_CPU1)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
-				else //if NO_ERROR then statusCode.address or data[2]|data[1] is the EnrtyAddr
+				else //if NO_ERROR then statusCode.address or data[2]|data[1] is the EntryAddr
 				{
-					cout << endl
-						 << "Entry Point Address is: 0x" << hex << setw(4) << setfill('0') << data[2] << hex << setw(4) << setfill('0') << data[1] << endl;
+					printf("\nEntry Point Address is: 0x%04x%04x\n", data[2], data[1]);
 				}
 				break;
 
@@ -468,12 +467,12 @@ int _tmain(int argc, TCHAR *argv[])
 			case 2:
 				if (!g_pszAppFile2)
 				{
-					cout << "ERROR: No flash application specified for CPU2 Flash Programming!" << endl;
+					_tprintf(_T("ERROR: No flash application specified for CPU2 Flash Programming!\n"));
 					ExitApp(3);
 				}
 				if (cpu2 == false)
 				{
-					cout << "ERROR: You must Boot_CPU2 before performing any operations on CPU2!" << endl;
+					_tprintf(_T("ERROR: You must Boot_CPU2 before performing any operations on CPU2!\n"));
 					break;
 				}
 				packetLength = constructPacket(packet, (uint16_t)DFU_CPU2, 0, NULL);
@@ -485,18 +484,17 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != DFU_CPU2)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
-				else //if NO_ERROR then statusCode.address or data[2]|data[1] is the EnrtyAddr
+				else //if NO_ERROR then statusCode.address or data[2]|data[1] is the EntryAddr
 				{
-					cout << endl
-						 << "Entry Point Address is: 0x" << hex << setw(4) << setfill('0') << data[2] << hex << setw(4) << setfill('0') << data[1] << endl;
+					printf("\nEntry Point Address is: 0x%04x%04x\n", data[2], data[1]);
 				}
 				break;
 
@@ -505,7 +503,7 @@ int _tmain(int argc, TCHAR *argv[])
 				gu32_EraseSectors1 = 0;
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				_tprintf(_T("Please input which Sectors (Letter) you want to erase for CPU1. Type '0' when finished.\n"));
@@ -529,13 +527,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != ERASE_CPU1)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -544,7 +542,7 @@ int _tmain(int argc, TCHAR *argv[])
 				gu32_EraseSectors2 = 0;
 				if (cpu2 == false)
 				{
-					cout << "ERROR: You must Boot_CPU2 before performing any operations on CPU2!" << endl;
+					_tprintf(_T("ERROR: You must Boot_CPU2 before performing any operations on CPU2!\n"));
 					break;
 				}
 				_tprintf(_T("Please input which Sectors (Letter) you want to erase for CPU2. Type '0' when finished.\n"));
@@ -568,13 +566,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != ERASE_CPU2)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -582,12 +580,12 @@ int _tmain(int argc, TCHAR *argv[])
 			case 5:
 				if (!g_pszAppFile)
 				{
-					cout << "ERROR: No flash application specified for CPU1 Flash Verification!" << endl;
+					_tprintf(_T("ERROR: No flash application specified for CPU1 Flash Verification!\n"));
 					ExitApp(3);
 				}
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				packetLength = constructPacket(packet, (uint16_t)VERIFY_CPU1, 0, NULL);
@@ -599,13 +597,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != VERIFY_CPU1)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -613,12 +611,12 @@ int _tmain(int argc, TCHAR *argv[])
 			case 6:
 				if (!g_pszAppFile2)
 				{
-					cout << "ERROR: No flash application specified for CPU2 Flash Verification!" << endl;
+					_tprintf(_T("ERROR: No flash application specified for CPU2 Flash Verification!\n"));
 					ExitApp(3);
 				}
 				if (cpu2 == false)
 				{
-					cout << "ERROR: You must Boot_CPU2 before performing any operations on CPU2!" << endl;
+					_tprintf(_T("ERROR: You must Boot_CPU2 before performing any operations on CPU2!\n"));
 					break;
 				}
 				packetLength = constructPacket(packet, (uint16_t)VERIFY_CPU2, 0, NULL);
@@ -630,13 +628,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != VERIFY_CPU2)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -644,7 +642,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 7:
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				_tprintf(_T("\nPlease input the 128-bit password for Zone 1 as 4 32-bit hexadecimal numbers.\n"));
@@ -663,13 +661,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != CPU1_UNLOCK_Z1)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -677,7 +675,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 8:
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				_tprintf(_T("\nPlease input the 128-bit password for Zone 2 as 4 32-bit hexadecimal numbers.\n"));
@@ -696,13 +694,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != CPU1_UNLOCK_Z2)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -710,7 +708,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 9:
 				if (cpu2 == false)
 				{
-					cout << "ERROR: You must Boot_CPU2 before performing any operations on CPU2!" << endl;
+					_tprintf(_T("ERROR: You must Boot_CPU2 before performing any operations on CPU2!\n"));
 					break;
 				}
 				_tprintf(_T("\nPlease input the 128-bit password for Zone 1 as 4 32-bit hexadecimal numbers.\n"));
@@ -729,13 +727,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != CPU2_UNLOCK_Z1)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -743,7 +741,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 10:
 				if (cpu2 == false)
 				{
-					cout << "ERROR: You must Boot_CPU2 before performing any operations on CPU2!" << endl;
+					_tprintf(_T("ERROR: You must Boot_CPU2 before performing any operations on CPU2!\n"));
 					break;
 				}
 				_tprintf(_T("\nPlease input the 128-bit password for Zone 2 as 4 32-bit hexadecimal numbers.\n"));
@@ -762,13 +760,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != CPU2_UNLOCK_Z2)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -776,7 +774,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 11:
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				_tprintf(_T("\nPlease input a hexadecimal address to branch to:  "));
@@ -791,7 +789,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 12:
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				packetLength = constructPacket(packet, (uint16_t)RESET_CPU1, 0, NULL);
@@ -804,12 +802,12 @@ int _tmain(int argc, TCHAR *argv[])
 			case 13:
 				if (!g_pszKernelFile2)
 				{
-					cout << "ERROR: No CPU2 flash kernel provided!" << endl;
+					_tprintf(_T("ERROR: No CPU2 flash kernel provided!\n"));
 					ExitApp(3);
 				}
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				_tprintf(_T("\nPlease input a hexadecimal address to branch to:  "));
@@ -842,12 +840,12 @@ int _tmain(int argc, TCHAR *argv[])
 			case 14:
 				if (!g_pszKernelFile2)
 				{
-					cout << "ERROR: No CPU2 flash kernel provided!" << endl;
+					_tprintf(_T("ERROR: No CPU2 flash kernel provided!\n"));
 					ExitApp(3);
 				}
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				packetLength = constructPacket(packet, (uint16_t)RESET_CPU1_BOOT_CPU2, 0, NULL);
@@ -878,7 +876,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 15:
 				if (cpu2 == false)
 				{
-					cout << "ERROR: You must Boot_CPU2 before performing any operations on CPU2!" << endl;
+					_tprintf(_T("ERROR: You must Boot_CPU2 before performing any operations on CPU2!\n"));
 					break;
 				}
 				_tprintf(_T("\nPlease input a hexadecimal address to branch to:  "));
@@ -893,7 +891,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 16:
 				if (cpu2 == false)
 				{
-					cout << "ERROR: You must Boot_CPU2 before performing any operations on CPU2!" << endl;
+					_tprintf(_T("ERROR: You must Boot_CPU2 before performing any operations on CPU2!\n"));
 					break;
 				}
 				packetLength = constructPacket(packet, (uint16_t)RESET_CPU2, 0, NULL);
@@ -905,13 +903,13 @@ int _tmain(int argc, TCHAR *argv[])
 				//------------------------------------DONE-----------------------------------------//
 			case 0:
 				done = true;
-				cout << "Exiting the Application." << endl;
+				_tprintf(_T("Exiting the Application.\n"));
 				break;
 
 				//------------------------------------DEFAULT-------------------------------------//
 			default:
 				done = true;
-				cout << "Exiting the Application." << endl;
+				_tprintf(_T("Exiting the Application.\n"));
 				break;
 			}
 		}
@@ -965,12 +963,12 @@ int _tmain(int argc, TCHAR *argv[])
 			case 1:
 				if (!g_pszAppFile)
 				{
-					cout << "ERROR: No flash application specified for CPU1 Flash Programming!" << endl;
+					_tprintf(_T("ERROR: No flash application specified for CPU1 Flash Programming!\n"));
 					ExitApp(3);
 				}
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				packetLength = constructPacket(packet, (uint16_t)DFU_CPU1, 0, NULL);
@@ -982,18 +980,17 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != DFU_CPU1)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
-				else //if NO_ERROR then statusCode.address or data[2]|data[1] is the EnrtyAddr
+				else //if NO_ERROR then statusCode.address or data[2]|data[1] is the EntryAddr
 				{
 					// format mem addr output.
-					cout << endl
-						 << "Entry Point Address is: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("\nEntry Point Address is: 0x%04x%04x\n", data[2], data[1]);
 				}
 				break;
 
@@ -1002,7 +999,7 @@ int _tmain(int argc, TCHAR *argv[])
 				gu32_EraseSectors1 = 0;
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 
@@ -1047,13 +1044,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != ERASE_CPU1)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -1061,12 +1058,12 @@ int _tmain(int argc, TCHAR *argv[])
 			case 3:
 				if (!g_pszAppFile)
 				{
-					cout << "ERROR: No flash application specified for CPU1 Flash Verification!" << endl;
+					_tprintf(_T("ERROR: No flash application specified for CPU1 Flash Verification!\n"));
 					ExitApp(3);
 				}
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				packetLength = constructPacket(packet, (uint16_t)VERIFY_CPU1, 0, NULL);
@@ -1078,13 +1075,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != VERIFY_CPU1)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -1092,7 +1089,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 4:
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				_tprintf(_T("\nPlease input the 128-bit password for Zone 1 as 4 32-bit hexadecimal numbers.\n"));
@@ -1111,13 +1108,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != CPU1_UNLOCK_Z1)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -1125,7 +1122,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 5:
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				_tprintf(_T("\nPlease input the 128-bit password for Zone 2 as 4 32-bit hexadecimal numbers.\n"));
@@ -1144,13 +1141,13 @@ int _tmain(int argc, TCHAR *argv[])
 				command = getPacket(&length, data);
 				if (command != CPU1_UNLOCK_Z2)
 				{
-					cout << "ERROR with Packet Command!" << endl;
+					_tprintf(_T("ERROR with Packet Command!\n"));
 				}
 				if (data[0] != NO_ERROR)
 				{
 					printErrorStatus(data[0]);
 					// format mem addr output.
-					cout << "ERROR Address: 0x" << hex << formatMemAddr(data[2], data[1]) << endl;
+					printf("ERROR Address: 0x%08x\n", formatMemAddr(data[2], data[1]));
 				}
 				break;
 
@@ -1158,7 +1155,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 6:
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				_tprintf(_T("\nPlease input a hexadecimal address to branch to:  "));
@@ -1174,7 +1171,7 @@ int _tmain(int argc, TCHAR *argv[])
 			case 7:
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1 after CPU2 is booted and given control of SCI!\n"));
 					break;
 				}
 				packetLength = constructPacket(packet, (uint16_t)RESET_CPU1, 0, NULL);
@@ -1191,12 +1188,12 @@ int _tmain(int argc, TCHAR *argv[])
 				//
 				if (!g_pszAppFile)
 				{
-					cout << "ERROR: No flash application specified for CPU1 Flash Programming!" << endl;
+					_tprintf(_T("ERROR: No flash application specified for CPU1 Flash Programming!\n"));
 					ExitApp(3);
 				}
 				if (cpu1 == false)
 				{
-					cout << "ERROR: Cannot perform operations on CPU1!" << endl;
+					_tprintf(_T("ERROR: Cannot perform operations on CPU1!\n"));
 					break;
 				}
 
@@ -1221,13 +1218,13 @@ int _tmain(int argc, TCHAR *argv[])
 				//------------------------------------DONE-----------------------------------------//
 			case 0:
 				done = true;
-				cout << "Exiting the Application." << endl;
+				_tprintf(_T("Exiting the Application.\n"));
 				break;
 
 				//------------------------------------DEFAULT-------------------------------------//
 			default:
 				done = true;
-				cout << "Exiting the Application." << endl;
+				_tprintf(_T("Exiting the Application.\n"));
 				break;
 			}
 		}
