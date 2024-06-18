@@ -1657,22 +1657,22 @@ void printErrorStatus(uint16_t status)
 	switch (status)
 	{
 	case BLANK_ERROR:
-		cout << "ERROR Status: BLANK_ERROR" << endl;
+		_tprintf(_T("ERROR Status: BLANK_ERROR\n"));
 		break;
 	case VERIFY_ERROR:
-		cout << "ERROR Status: VERIFY_ERROR" << endl;
+		_tprintf(_T("ERROR Status: VERIFY_ERROR\n"));
 		break;
 	case PROGRAM_ERROR:
-		cout << "ERROR Status: PROGRAM_ERROR" << endl;
+		_tprintf(_T("ERROR Status: PROGRAM_ERROR\n"));
 		break;
 	case COMMAND_ERROR:
-		cout << "ERROR Status: COMMAND_ERROR" << endl;
+		_tprintf(_T("ERROR Status: COMMAND_ERROR\n"));
 		break;
 	case UNLOCK_ERROR:
-		cout << "ERROR Status: UNLOCK_ERROR" << endl;
+		_tprintf(_T("ERROR Status: UNLOCK_ERROR\n"));
 		break;
 	default:
-		cout << "ERROR Status: Not Recognized Error" << endl;
+		_tprintf(_T("ERROR Status: Not Recognized Error\n"));
 		break;
 	}
 }
