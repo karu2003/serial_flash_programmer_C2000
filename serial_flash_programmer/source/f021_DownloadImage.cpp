@@ -99,6 +99,14 @@ int f021_DownloadImage(wchar_t *applicationFile);
 
 //*****************************************************************************
 //
+// more external prototypes
+// these functions are declared in f021_SendMessage.cpp
+//
+//*****************************************************************************
+extern void sendACK(void);
+
+//*****************************************************************************
+//
 // Download an image to the the device identified by the passed handle.  The
 // image to be downloaded and other parameters related to the operation are
 // controlled by command line parameters via global variables.
@@ -167,11 +175,7 @@ void loadProgram_checksum(FILE *fh)
 #endif
 	}
 	//Send ACK as expected
-#ifdef __linux__
-    write(fd, &ack, 1);
-#else
-	WriteFile(file, &ack, 1, &dwWritten, NULL);
-#endif
+	sendACK();
 
 	//Receive MSB from checksum
 	dwRead = 0;
@@ -190,11 +194,7 @@ void loadProgram_checksum(FILE *fh)
 #endif
 	}
 	//Send ACK as expected
-#ifdef __linux__
-    write(fd, &ack, 1);
-#else
-	WriteFile(file, &ack, 1, &dwWritten, NULL);
-#endif
+	sendACK();
 
 	rcvData = (sendData[1] << 8) + sendData[0];
 	//Ensure checksum matches
@@ -308,11 +308,7 @@ void loadProgram_checksum(FILE *fh)
 #endif
 				}
 				//Send ACK as expected
-#ifdef __linux__
-    			write(fd, &ack, 1);
-#else
-				WriteFile(file, &ack, 1, &dwWritten, NULL);
-#endif
+				sendACK();
 				//receive checksum MSB
 				dwRead = 0;
 				while (dwRead == 0)
@@ -330,11 +326,7 @@ void loadProgram_checksum(FILE *fh)
 #endif
 				}
 				//Send ACK as expected
-#ifdef __linux__
-    			write(fd, &ack, 1);
-#else
-				WriteFile(file, &ack, 1, &dwWritten, NULL);
-#endif
+				sendACK();
 
 				rcvData = sendData[0] | (sendData[1] << 8);
 				//Ensure checksum matches
@@ -386,11 +378,7 @@ void loadProgram_checksum(FILE *fh)
 #endif
 		}
 		//Send ACK as expected
-#ifdef __linux__
-    	write(fd, &ack, 1);
-#else
-		WriteFile(file, &ack, 1, &dwWritten, NULL);
-#endif
+		sendACK();
 		//receive checksum MSB
 		dwRead = 0;
 		while (dwRead == 0)
@@ -408,11 +396,7 @@ void loadProgram_checksum(FILE *fh)
 #endif
 		}
 		//Send ACK as expected
-#ifdef __linux__
-    	write(fd, &ack, 1);
-#else
-		WriteFile(file, &ack, 1, &dwWritten, NULL);
-#endif
+		sendACK();
 
 		rcvData = sendData[0] | (sendData[1] << 8);
 		//Ensure checksum matches
